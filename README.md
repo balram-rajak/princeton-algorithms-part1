@@ -32,7 +32,6 @@ princeton-algorithms-part1/
   Module 13 - Symbol Table Applications/
   lib/
     TaskRunner.cpp
-    Main_Boilerplate/
     algs4.jar
   .gitignore
   inputf.in
@@ -58,32 +57,33 @@ cd princeton-algorithms-part1
 
 ## Run (Java)
 
-### Option A — Plain `javac` / `java`
-
-Compile a Java file:
+### Standard Java compilation
 
 ```bash
 javac -cp "lib/algs4.jar;." "Module 02 - Union-Find/Percolation.java"
-```
-
-Run it:
-
-```bash
 java -cp "lib/algs4.jar;." Percolation
 ```
 
-Notes:
-- Some assignments require the Princeton libraries and specific class names/signatures.
-- If your class is in a folder and not in a package, make sure you run it from the repo root and that the class is on the classpath.
+> **Note:** Run commands from the repo root. Princeton assignments require `algs4.jar` in your classpath.
 
-### Option B — VS Code TaskRunner (quick run)
+### ⚡ Quick run with VS Code TaskRunner
 
-This repo includes a helper runner used by a VS Code task (see `.vscode/tasks.json` if present in your setup). The runner compiles/runs the currently opened file and uses `inputf.in` → `outputf.in` for stdin/stdout redirection.
+**Press `Ctrl+Shift+B`** — automatically compiles, times execution, and handles I/O redirection (`inputf.in` → `outputf.in`).
 
-Typical workflow:
-1. Put input in `inputf.in`
-2. Run the default build task in VS Code
-3. Read output from `outputf.in`
+**Supports:** C++, Java, Python, JavaScript
+
+**Workflow:**
+1. Write input → `inputf.in`
+2. Hit `Ctrl+Shift+B`
+3. Check output → `outputf.in`
+
+**Rebuild TaskRunner** (if modified):
+```bash
+cd lib
+g++ -std=c++17 TaskRunner.cpp -o TaskRunner.exe
+```
+
+Extend language support in [lib/TaskRunner.cpp](lib/TaskRunner.cpp).
 
 ## Notes / best practices
 
