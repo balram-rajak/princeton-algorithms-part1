@@ -57,11 +57,11 @@ cd princeton-algorithms-part1
 
 ## Run (Java)
 
-### Standard Java compilation
+### Standard Java compilation and Execution
 
 ```bash
 javac -cp "lib/algs4.jar;." "Module 02 - Union-Find/Percolation.java"
-java -cp "lib/algs4.jar;." Percolation
+java -cp ".;../lib\algs4.jar" RandomWord < ..\inputf.in
 ```
 
 > **Note:** Run commands from the repo root. Princeton assignments require `algs4.jar` in your classpath.
