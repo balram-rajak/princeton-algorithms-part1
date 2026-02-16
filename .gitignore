@@ -30,8 +30,7 @@ bin/
 out/
 
 # Input/Output files
-inputf.in
-outputf.in
+*.in
 
 # OS files
 .DS_Store
