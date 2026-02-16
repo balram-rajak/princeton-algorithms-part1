@@ -1,0 +1,46 @@
+# Compiled files
+*.class
+*.exe
+*.o
+*.obj
+
+# Package Files
+*.jar
+*.war
+*.ear
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Build directories
+target/
+build/
+bin/
+out/
+
+# Input/Output files
+inputf.in
+outputf.in
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+~*
