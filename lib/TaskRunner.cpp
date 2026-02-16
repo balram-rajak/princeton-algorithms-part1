@@ -4,20 +4,29 @@
 #include <chrono>
 #include <algorithm>
 #include <cstdlib>
-#include <filesystem>
+#include <cctype>
 // #include "Timer.h"
 
-namespace fs = std::filesystem;
+static void splitPath(const std::string& filePath, std::string& baseNameNoExt, std::string& extension) {
+    const std::string::size_type slashPos = filePath.find_last_of("/\\");
+    const std::string::size_type nameStart = (slashPos == std::string::npos) ? 0 : slashPos + 1;
+    const std::string::size_type dotPos = filePath.find_last_of('.');
+
+    if (dotPos == std::string::npos || dotPos < nameStart) {
+        baseNameNoExt = filePath.substr(nameStart);
+        extension.clear();
+        return;
+    }
+
+    baseNameNoExt = filePath.substr(nameStart, dotPos - nameStart);
+    extension = filePath.substr(dotPos);
+}
 
 void runTaskRunner(const std::string& filePath, const std::string& compileOutDir, const std::string& inputFile, const std::string& outputFile) {
     // Extract file name and extension
-    fs::path file(filePath);
-    std::string fileBaseNameNoExtension = file.stem().string();
-    std::string fileExtension = file.extension().string();
-
-    // Convert to relative paths for ccache compatibility (absolute paths break cache hashing)
-    fs::path relFilePath = fs::relative(filePath);
-    fs::path relCompileOutDir = fs::relative(compileOutDir);
+    std::string fileBaseNameNoExtension;
+    std::string fileExtension;
+    splitPath(filePath, fileBaseNameNoExtension, fileExtension);
 
     std::string compileCommand;
     std::string runCommand;
@@ -26,20 +35,20 @@ void runTaskRunner(const std::string& filePath, const std::string& compileOutDir
     if (fileExtension == ".cpp") {
         // Note: ccache on Windows+MinGW is unreliable (known issue). Use g++ directly.
         // For fast compilation, use minimal headers (#include <iostream>, <utility>, <string>) instead of bits/stdc++.h
-        compileCommand = "g++ -std=c++17 -O2 -I\"F:\\vault\\CodeLab\\princeton-algorithms-part1\\lib\" -include bits/stdc++.h \"" + relFilePath.string() + "\" -o \"" + relCompileOutDir.string() +"\\"+ fileBaseNameNoExtension + ".exe\"";
+        compileCommand = "g++ -std=c++17 -O2 -I\"F:\\vault\\CodeLab\\princeton-algorithms-part1\\lib\" -include bits/stdc++.h \"" + filePath + "\" -o \"" + compileOutDir +"\\"+ fileBaseNameNoExtension + ".exe\"";
 
-        runCommand = "\""+relCompileOutDir.string() +"\\"+ fileBaseNameNoExtension + ".exe\" < \"" + inputFile + "\" > \"" + outputFile + "\"";
+        runCommand = "\"" + compileOutDir + "\\" + fileBaseNameNoExtension + ".exe\" < \"" + inputFile + "\" > \"" + outputFile + "\"";
     } else if (fileExtension == ".java") {
-        compileCommand = "javac \"" + relFilePath.string() + "\" -d \"" + relCompileOutDir.string() + "\"";
-        // runCommand = "java -Xms16m -Xmx16m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -cp \"" + relCompileOutDir.string() + "\" " + fileBaseNameNoExtension + " < \"" + inputFile + "\" > \"" + outputFile + "\"";
-        runCommand = "java -cp \"" + relCompileOutDir.string() + "\" " + fileBaseNameNoExtension + " < \"" + inputFile + "\" > \"" + outputFile + "\"";
+        compileCommand = "javac \"" + filePath + "\" -d \"" + compileOutDir + "\"";
+        // runCommand = "java -Xms16m -Xmx16m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -cp \"" + compileOutDir + "\" " + fileBaseNameNoExtension + " < \"" + inputFile + "\" > \"" + outputFile + "\"";
+        runCommand = "java -cp \"" + compileOutDir + "\" " + fileBaseNameNoExtension + " < \"" + inputFile + "\" > \"" + outputFile + "\"";
     
     } else if (fileExtension == ".py") {
         compileCommand = "";  // Python doesn't need compilation
-        runCommand = "python3 \"" + relFilePath.string() + "\" < \"" + inputFile + "\" > \"" + outputFile + "\"";
+        runCommand = "python3 \"" + filePath + "\" < \"" + inputFile + "\" > \"" + outputFile + "\"";
     } else if (fileExtension == ".js") {
         compileCommand = "";  // JavaScript doesn't need compilation
-        runCommand = "node \"" + relFilePath.string() + "\" < \"" + inputFile + "\" > \"" + outputFile + "\"";
+        runCommand = "node \"" + filePath + "\" < \"" + inputFile + "\" > \"" + outputFile + "\"";
     }else {
         std::cerr << "Unsupported file type: " << fileExtension << std::endl;
         return;
@@ -49,41 +58,28 @@ void runTaskRunner(const std::string& filePath, const std::string& compileOutDir
     std::cout << "Compilation command: " << compileCommand << std::endl;
     std::cout << "Execution command:   " << runCommand << std::endl;
 
-    auto captureMs = [](const std::string& cmd) -> std::pair<int, double> {
-        std::string ps =
-            "powershell -NoLogo -NoProfile -NonInteractive -Command \"$sw=[System.Diagnostics.Stopwatch]::StartNew(); cmd /c '" +
-            cmd +
-            "'; $code=$LASTEXITCODE; $sw.Stop(); if($code -ne 0){ exit $code }; [int]$sw.ElapsedMilliseconds\"";
+        auto captureMs = [](const std::string& cmd) -> std::pair<int, double> {
+        if (cmd.empty()) return {0, 0.0};
 
-#ifdef _WIN32
-        FILE* pipe = _popen(ps.c_str(), "r");
-#else
-        FILE* pipe = popen(ps.c_str(), "r");
-#endif
-        if (!pipe) return {1, 0.0};
-        std::string out; char buffer[256];
-        while (fgets(buffer, sizeof(buffer), pipe)) out += buffer;
-#ifdef _WIN32
-        int code = _pclose(pipe);
-#else
-        int code = pclose(pipe);
-#endif
-        // Trim whitespace
-        auto isspace_lambda = [](unsigned char c){ return std::isspace(c) != 0; };
-        out.erase(out.begin(), std::find_if(out.begin(), out.end(), [&](unsigned char c){return !isspace_lambda(c);}));
-        out.erase(std::find_if(out.rbegin(), out.rend(), [&](unsigned char c){return !isspace_lambda(c);}).base(), out.end());
-        double ms = 0.0;
-        try { if (!out.empty()) ms = std::stod(out); } catch (...) { /* ignore parse error */ }
+        auto start = std::chrono::steady_clock::now();
+        int code = std::system(cmd.c_str());
+        auto end = std::chrono::steady_clock::now();
+
+        double ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
         return {code, ms};
-    };
+        };
 
-    auto [compileCode, compileMs] = captureMs(compileCommand);
+    std::pair<int, double> compileResult = captureMs(compileCommand);
+    int compileCode = compileResult.first;
+    double compileMs = compileResult.second;
     if (compileCode != 0) {
         std::cerr << "Compilation failed (exit code: " << compileCode << ")." << std::endl;
         return;
     }
 
-    auto [runCode, runMs] = captureMs(runCommand);
+    std::pair<int, double> runResult = captureMs(runCommand);
+    int runCode = runResult.first;
+    double runMs = runResult.second;
     if (runCode != 0) {
         std::cerr << "Execution failed (exit code: " << runCode << ")." << std::endl;
         return;
