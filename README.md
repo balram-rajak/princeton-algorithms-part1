@@ -1,3 +1,13 @@
+- [Princeton — Algorithms, Part I (Coursera)](#princeton--algorithms-part-i-coursera)
+  - [What’s in this repo](#whats-in-this-repo)
+  - [Repository structure (high level)](#repository-structure-high-level)
+  - [Prerequisites](#prerequisites)
+  - [Clone](#clone)
+    - [create `inputf.in` and `outputf.in` files in root directory of repository](#create-inputfin-and-outputfin-files-in-root-directory-of-repository)
+    - [⚡ Quick run with VS Code TaskRunner](#-quick-run-with-vs-code-taskrunner)
+  - [Notes / best practices](#notes--best-practices)
+  - [License](#license)
+
 # Princeton — Algorithms, Part I (Coursera)
 
 Coursework, notes, and implementations while following **Algorithms, Part I** by Robert Sedgewick and Kevin Wayne (Princeton University) on Coursera.
@@ -59,7 +69,18 @@ cd princeton-algorithms-part1
 ```bash
 type nul > inputf.in
 type nul > outputf.in
-```
+```- [Princeton — Algorithms, Part I (Coursera)](#princeton--algorithms-part-i-coursera)
+  - [What’s in this repo](#whats-in-this-repo)
+  - [Repository structure (high level)](#repository-structure-high-level)
+  - [Prerequisites](#prerequisites)
+  - [Clone](#clone)
+    - [create `inputf.in` and `outputf.in` files in root directory of repository](#create-inputfin-and-outputfin-files-in-root-directory-of-repository)
+  - [Run (Java)](#run-java)
+    - [Standard Java compilation and Execution](#standard-java-compilation-and-execution)
+    - [⚡ Quick run with VS Code TaskRunner](#-quick-run-with-vs-code-taskrunner)
+  - [Notes / best practices](#notes--best-practices)
+  - [License](#license)
+
 
 ## Run (Java)
 
