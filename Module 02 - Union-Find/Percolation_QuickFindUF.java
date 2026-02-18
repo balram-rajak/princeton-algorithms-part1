@@ -1,10 +1,10 @@
 
-import edu.princeton.cs.algs4.WeightedQuickUnionUF;
+import edu.princeton.cs.algs4.QuickFindUF;
 
 // Using Row major mapping for 2D -> 1D Array mapping
-public class Percolation implements Percolation{
+public class Percolation_QuickFindUF {
 
-    WeightedQuickUnionUF wQU;
+    private QuickFindUF qf;
 
     // private int n_grid[];
 
@@ -43,8 +43,7 @@ public class Percolation implements Percolation{
 
     private boolean isVirtualSite(int i) {
 
-        // Virtual site are either the top, bottom or the last 2 extra index of grid representing virtual sites
-        return i < n ^ i > grids - n- 1;
+        return i < n ^ i > grids - n-1;
     }
 
     private boolean isValidSite(int i) {
@@ -53,7 +52,7 @@ public class Percolation implements Percolation{
     }
 
     // creates n-by-n grid, with all sites initially blocked
-    public Percolation(int n) {
+    public Percolation_QuickFindUF(int n) {
 
         if (n <= 0) {
             throw new IllegalArgumentException("n ≤ 0");
@@ -65,7 +64,7 @@ public class Percolation implements Percolation{
         
         this.grid_length = grids+2;
         // university library usage
-        wQU = new WeightedQuickUnionUF(grid_length);
+        qf = new QuickFindUF(grid_length);
 
         // n_grid = new int[grids + 2];
 
@@ -86,7 +85,8 @@ public class Percolation implements Percolation{
         }
     }
 
-    // My custom function: Find root of a site
+    //  My custom function: Find root of a site
+    /*
     private int root(int i) {
 
         if (i < 0 && i > grids - 1)
@@ -94,17 +94,16 @@ public class Percolation implements Percolation{
 
         // int temp = n_grid[i];
 
-        // while (i != n_grid[i]) {
-        while (i != wQU.find(i)){
+        while (i != qf.find(i)) {
+
             // halve path compression
             // n_grid[i] = n_grid[n_grid[i]];
 
-            i = wQU.find(i);
+            i = qf.find(i);
 
         }
 
         // Complete path compression
-        /*
         int root = i;
 
         i = temp;
@@ -117,15 +116,17 @@ public class Percolation implements Percolation{
 
             i = temp;
         }
-        */
 
         return i;
     }
 
+    */
+    
+
     private void union(int p, int q) {
 
-        // site p is assumed to be valid and open
-        if (isValidSite(q) && site_state[q]) {
+        // site q is assumed to be valid and open
+        if (isValidSite(p) && site_state[p]) {
 
             
             // print(String.format("p: %s -> %s | q: %s -> %s",p,i,q,j));
@@ -151,7 +152,7 @@ public class Percolation implements Percolation{
             */
 
             // Using university library class to suffice the specification
-            wQU.union(p, q);
+            qf.union(p, q);
 
             // print(String.format("p: %s -> %s | q: %s -> %s",p,n_grid[i],q,n_grid[j]));
         }
@@ -177,13 +178,12 @@ public class Percolation implements Percolation{
         if (i < n) {
             // n_grid[i] = grids;
             // Also using university library class to suffice the specification
-            wQU.union(i, grids);
+            qf.union(i, grids);
         } else if (i > grids - n - 1) {
             // n_grid[i] = grids + 1;
             // Also using university library class to suffice the specification
-            wQU.union(i, grids+1);
+            qf.union(i, grids+1);
         }
-
         // print(String.format("i: %s -> %s",i,n_grid[i]));
         // connect with near by sites
 
@@ -193,9 +193,10 @@ public class Percolation implements Percolation{
         // (col-1, row) = i+n | down element
 
         for (int site : getNearbySites(i)) {
-            union(i, site);
+            union(site, i);
 
         }
+
         ++openSites;
 
     }
@@ -229,18 +230,19 @@ public class Percolation implements Percolation{
 
             // check the site is valid, open & root is virtual site
             // if (isValidSite(site) && site_state[site] && isVirtualSite(n_grid[site]))
-        if (isValidSite(site) && site_state[site] && isVirtualSite(root(site)))
+            if (isValidSite(site) && site_state[site] && isVirtualSite(qf.find(site)))
                 return true;
         }
 
-        return isVirtualSite(root(i));
+        // return isVirtualSite(n_grid[i]);
+        return isVirtualSite(qf.find(i));
     }
 
     // returns the number of open sites
     public int numberOfOpenSites() {
 
         // return openSites;
-        return wQU.count();
+        return qf.count();
     }
 
     // does the system percolate?
@@ -251,26 +253,28 @@ public class Percolation implements Percolation{
         // return root(length - 1) == root(length - 2);
 
         // Also using university library class to suffice the specification
-        return wQU.find(length-1) == wQU.find(length-2);
+        return qf.find(length-1) == qf.find(length-2);
     }
 
     // test client (optional)
     public static void main(String[] args) {
 
-        Percolation p3 = new Percolation(3);
+        Percolation_QuickFindUF p3 = new Percolation_QuickFindUF(3);
 
         p3.open(2,2);
         print(p3.isFull(3,2));
 
         p3.open(1,2);
+        // print(p3.root(p3.mapIndex(1, 2)));
         print(p3.isFull(1,2));
         print("Open Sites:"+p3.openSites);
 
         p3.open(3,2);
-        print(p3.isFull(1,2));
+        // p3.print(p3.n_grid);
         print(p3.percolates());
+        print(p3.isFull(1,2));
 
-        Percolation p4 = new Percolation(4);
+        Percolation_QuickFindUF p4 = new Percolation_QuickFindUF(4);
 
         p4.open(2,2);
         p4.open(2,3);
