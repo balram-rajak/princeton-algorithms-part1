@@ -9,7 +9,7 @@
     - [⚡ Quick run with VS Code TaskRunner](#-quick-run-with-vs-code-taskrunner)
   - [Notes / best practices](#notes--best-practices)
   - [License](#license)
-
+- [Help](#help)
 # Princeton — Algorithms, Part I (Coursera)
 
 Coursework, notes, and implementations while following **Algorithms, Part I** by Robert Sedgewick and Kevin Wayne (Princeton University) on Coursera. This course is replica of Princeton university **[COS226](https://www.cs.princeton.edu/courses/archive/fall13/cos226/info.php)** course work.
@@ -113,3 +113,7 @@ Extend language support in [lib/TaskRunner.cpp](lib/TaskRunner.cpp).
 ## License
 
 This repository is for personal learning and reference. Princeton/Coursera course content and the `algs4` library are owned by their respective authors.
+
+# Help
+- Access discussion formums [here](https://www.coursera.org/learn/algorithms-part1/discussions)
+- [Assessment guide](https://www.coursera.org/learn/algorithms-part1/resources/R2mre)
