@@ -2,24 +2,16 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 /**
- * This solution handles percolation backwash issue.
- * A byte array represents the status of each site, indicating open and
- * connection
- * to top and bottom without using virtual sites
+ * This percolation is prone to backwash, therefore a new implementation 
+ * is created that is implemented using byte[] array based on status concept and neglecting 
+ * virtual sites altogether
  */
 // Using Row major mapping for 2D -> 1D Array mapping
-public class Percolation {
-
-    private static final byte TOPOPEN = 6;
-    private static final byte BOTTOMOPEN = 5;
-    private static final byte OPEN = 4;
-    private static final byte FULL = 7;
-
-    private final byte[] siteState;
+public class PercolationNormal {
 
     private final WeightedQuickUnionUF wqu;
 
-    private byte status = 0;
+    private final boolean[] siteState;
 
     private int openSites = 0;
 
@@ -27,8 +19,10 @@ public class Percolation {
 
     private final int grids;
 
+    private final int gridLength;
+
     // creates n-by-n grid, with all sites initially blocked
-    public Percolation(final int n) {
+    public PercolationNormal(final int n) {
 
         if (n <= 0) {
             throw new IllegalArgumentException("n ≤ 0");
@@ -38,22 +32,14 @@ public class Percolation {
 
         this.grids = n * n;
 
-        this.siteState = new byte[grids];
+        this.gridLength = grids + 1;
+        wqu = new WeightedQuickUnionUF(gridLength);
 
-        // int gridLength = grids + 1;
-
-        wqu = new WeightedQuickUnionUF(grids);
+        this.siteState = new boolean[grids];
 
         for (int i = 0; i < grids; i++) {
 
-            siteState[i] = 0;
-        }
-    }
-
-    private void setStatus(byte temp) {
-
-        if (temp > status) {
-            status = temp;
+            siteState[i] = false;
         }
     }
 
@@ -65,6 +51,11 @@ public class Percolation {
         System.out.println(obj);
     }
 
+    // private int[] getNearbySites(int i) {
+    // int[] sites = { i - 1, i + 1, i - n, i + n };
+    // return sites;
+    // }
+
     private boolean isValidSite(final int i) {
 
         return i > -1 && i < grids;
@@ -75,28 +66,39 @@ public class Percolation {
         return col > 0 && col <= n && row > 0 && row <= n;
     }
 
+    // private int root(int i) {
+
+    // while (i != wQU.find(i)) {
+
+    // i = wQU.find(i);
+
+    // }
+
+    // return i;
+    // }
+
+    private boolean isConnected(final int p, final int q) {
+        return wqu.find(p) == wqu.find(q);
+    }
+
     private void union(final int pRow, final int pCol, final int qRow, final int qCol) {
 
         final int i = mapIndex(pRow, pCol);
 
         if (isValidSite(qRow, qCol)) {
-            final int q = mapIndex(qRow, qCol);
-            union(i, q);
+            final int site = mapIndex(qRow, qCol);
+            union(i, site);
         }
 
     }
 
     private void union(final int p, final int q) {
 
-        if (siteState[q] != 0) {
-
-            byte temp = (byte) (siteState[wqu.find(p)] | siteState[wqu.find(q)]);
+        // site p is assumed to be valid and open
+        if (siteState[q]) {
 
             wqu.union(p, q);
 
-            siteState[wqu.find(p)] = temp;
-
-            setStatus(temp);
         }
     }
 
@@ -111,26 +113,18 @@ public class Percolation {
         }
 
         // if site is already open
-        if (siteState[i] != 0)
+        if (siteState[i])
             return;
         else // open the site i
-            siteState[i] = OPEN;
+            siteState[i] = true;
 
         if (row == 1) {
-            siteState[i] = (byte) (TOPOPEN | siteState[i]);
-            // wqu.union(i, grids);
+            wqu.union(i, grids);
         }
+
         if (row == n) {
-            siteState[i] = (byte) (BOTTOMOPEN | siteState[i]);
-            // wqu.union(i, grids + 1);
+            wqu.union(i, grids + 1);
         }
-
-        setStatus(siteState[i]);
-
-        // Bottom virtual site is not necessary
-        // if (row == n) {
-        // wqu.union(i, grids + 1);
-        // }
 
         /*************************************
          * connect with near by sites
@@ -161,7 +155,7 @@ public class Percolation {
             throw new IllegalArgumentException(String.format("index %s out of range", i));
         }
 
-        return siteState[i] != 0;
+        return siteState[i];
     }
 
     // is the site is open and near top/bottom site?
@@ -174,30 +168,35 @@ public class Percolation {
         }
 
         // If site is not open
-        if (siteState[i] == 0)
+        if (!siteState[i])
             return false;
 
         // If the nearby sites are top or bottom sites (Root of Top/Bottom site is
         // a virtual site
-        int q;
+        int site;
 
-        q = mapIndex(row, col - 1);
-        if (isValidSite(row, col - 1) && siteState[wqu.find(q)] >= TOPOPEN)
+        site = mapIndex(row, col - 1);
+        // check the site is valid, open & root is virtual site
+        if (isValidSite(row, col - 1) && siteState[site] && isConnected(site, grids))
             return true;
 
-        q = mapIndex(row, col + 1);
-        if (isValidSite(row, col + 1) && siteState[wqu.find(q)] >= TOPOPEN)
+        site = mapIndex(row, col + 1);
+        // check the site is valid, open & root is virtual site
+        if (isValidSite(row, col + 1) && siteState[site] && isConnected(site, grids))
             return true;
 
-        q = i - n;
-        if (isValidSite(q) && siteState[wqu.find(q)] >= TOPOPEN)
+        site = i - n;
+        // check the site is valid, open & root is virtual site
+        if (isValidSite(site) && siteState[site] && isConnected(site, grids))
             return true;
 
-        q = i + n;
-        if (isValidSite(q) && siteState[wqu.find(q)] >= TOPOPEN)
+        site = i + n;
+        // check the site is valid, open & root is virtual site
+        if (isValidSite(site) && siteState[site] && isConnected(site, grids))
             return true;
 
-        return siteState[i] >= TOPOPEN;
+        // check if i and any virtual site exist in same node
+        return isConnected(i, grids);
 
     }
 
@@ -210,7 +209,9 @@ public class Percolation {
     // does the system percolate?
     public boolean percolates() {
 
-        return status == FULL;
+        final int length = gridLength;
+        // is top virtual site connected to bottom\
+        return isConnected(length - 1, length - 2);
     }
 
     public static void main(final String[] args) {

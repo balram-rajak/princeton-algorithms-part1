@@ -4,13 +4,15 @@
   - [Prerequisites](#prerequisites)
   - [Clone](#clone)
     - [create `inputf.in` and `outputf.in` files in root directory of repository](#create-inputfin-and-outputfin-files-in-root-directory-of-repository)
+  - [Run (Java)](#run-java)
+    - [Standard Java compilation and Execution](#standard-java-compilation-and-execution)
     - [⚡ Quick run with VS Code TaskRunner](#-quick-run-with-vs-code-taskrunner)
   - [Notes / best practices](#notes--best-practices)
   - [License](#license)
 
 # Princeton — Algorithms, Part I (Coursera)
 
-Coursework, notes, and implementations while following **Algorithms, Part I** by Robert Sedgewick and Kevin Wayne (Princeton University) on Coursera.
+Coursework, notes, and implementations while following **Algorithms, Part I** by Robert Sedgewick and Kevin Wayne (Princeton University) on Coursera. This course is replica of Princeton university **[COS226](https://www.cs.princeton.edu/courses/archive/fall13/cos226/info.php)** course work.
 
 - Course: https://www.coursera.org/learn/algorithms-part1
 - Booksite (Algorithms, 4th ed.): https://algs4.cs.princeton.edu/home/
@@ -56,7 +58,8 @@ princeton-algorithms-part1/
   - Python 3
   - Node.js
 
-If you’re using the Princeton `algs4.jar`, it’s included in [lib/algs4.jar](lib/algs4.jar).
+- There are many pre built libraries of princeton university used in this course. Find documentation [here](https://algs4.cs.princeton.edu/code/javadoc/edu/princeton/cs/algs4/)
+- [lib/algs4.jar](lib/algs4.jar) contains all the libraries used in this project
 
 ## Clone
 
@@ -69,26 +72,15 @@ cd princeton-algorithms-part1
 ```bash
 type nul > inputf.in
 type nul > outputf.in
-```- [Princeton — Algorithms, Part I (Coursera)](#princeton--algorithms-part-i-coursera)
-  - [What’s in this repo](#whats-in-this-repo)
-  - [Repository structure (high level)](#repository-structure-high-level)
-  - [Prerequisites](#prerequisites)
-  - [Clone](#clone)
-    - [create `inputf.in` and `outputf.in` files in root directory of repository](#create-inputfin-and-outputfin-files-in-root-directory-of-repository)
-  - [Run (Java)](#run-java)
-    - [Standard Java compilation and Execution](#standard-java-compilation-and-execution)
-    - [⚡ Quick run with VS Code TaskRunner](#-quick-run-with-vs-code-taskrunner)
-  - [Notes / best practices](#notes--best-practices)
-  - [License](#license)
-
+```
 
 ## Run (Java)
 
 ### Standard Java compilation and Execution
 
 ```bash
-javac -cp "lib/algs4.jar;." "Module 02 - Union-Find/Percolation.java"
-java -cp ".;../lib\algs4.jar" RandomWord < ..\inputf.in
+javac -cp ".;lib/*;target" "F:\vault\CodeLab\princeton-algorithms-part1\Module 01 - Course Introduction\RandomWord.java" -d "target"
+java -cp ".;lib/*;target" RandomWord < "inputf.in" > "outputf.in"
 ```
 
 > **Note:** Run commands from the repo root. Princeton assignments require `algs4.jar` in your classpath.

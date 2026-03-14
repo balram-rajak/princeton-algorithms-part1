@@ -39,7 +39,7 @@ void runTaskRunner(const std::string& filePath, const std::string& compileOutDir
 
         runCommand = "\"" + compileOutDir + "\\" + fileBaseNameNoExtension + ".exe\" < \"" + inputFile + "\" > \"" + outputFile + "\"";
     } else if (fileExtension == ".java") {
-        compileCommand = "javac -cp \".;lib/*\" \"" + filePath + "\" -d \"" + compileOutDir + "\"";
+        compileCommand = "javac -cp \".;lib/*;" + compileOutDir + "\" \"" + filePath + "\" -d \"" + compileOutDir + "\"";
         // runCommand = "java -Xms16m -Xmx16m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -cp \"" + compileOutDir + "\" " + fileBaseNameNoExtension + " < \"" + inputFile + "\" > \"" + outputFile + "\"";
         runCommand = "java -cp \".;lib/*;" + compileOutDir + "\" " + fileBaseNameNoExtension + " < \"" + inputFile + "\" > \"" + outputFile + "\"";
     
